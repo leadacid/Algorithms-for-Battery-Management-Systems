@@ -24,10 +24,14 @@ RC = getParamESC('RCParam',25,model)
 
 Ark = exp(-1/RC)
 
-# function dOCVz = dOCVfromSOC(SOC ,OCV ,z)
+SOC = 0:0.01:1;
+OCV = OCVfromSOCtemp(SOC,25,model);
 
-#function dOCVz = dOCVfromSOC(SOC ,OCV ,z)
-#    dZ = SOC(2) - SOC(1) ; % Find spacing of SOC vector
-#    dUdZ = diff(OCV)/dZ; % Scaled forward finite difference
-#    dOCV = ([dUdZ(1) dUdZ] + [dUdZ dUdZ(end)])/2; % Avg of fwd / bkwd diffs
-#    dOCVz = interp1 (SOC ,dOCV ,z); 
+z = 0.2
+
+dZ = SOC(2) - SOC(1);  % Find spacing of SOC vector
+dUdZ = diff(OCV)/dZ; % Scaled forward finite difference
+dOCV = ([dUdZ(1) dUdZ] + [dUdZ dUdZ(end)])/2; % Avg of fwd / bkwd diffs
+dOCVz = interp1(SOC ,dOCV ,z); 
+
+dOCVz

@@ -117,9 +117,9 @@ end
 function [SigmaW, SigmaV, SigmaZ0] = tuneEKF
 
   % BEGIN MODIFYING CODE AFTER THIS
-  SigmaW  = 0.0008; % This is a sample value. You will need to change it.
-  SigmaV  = 0.0008; % This is a sample value. You will need to change it.
-  SigmaZ0 = 0.0013; % This is a sample value. You will need to change it.
+  SigmaW  = 0.00075; % This is a sample value. You will need to change it.
+  SigmaV  = 0.00075; % This is a sample value. You will need to change it.
+  SigmaZ0 = 0.0015; % This is a sample value. You will need to change it.
 end  
 
 % Load model file corresponding to a cell of this type

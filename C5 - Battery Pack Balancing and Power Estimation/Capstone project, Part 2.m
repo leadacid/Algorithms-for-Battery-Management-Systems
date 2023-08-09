@@ -39,31 +39,39 @@ function [pChg,pDis] = HPPCpower(z0,T,dT,eta,ns,np,model,limits)
   % Note that rChg and rDis are calculated correctly for the default input parameters
   % but are not calculated correctly for non-default inputs. You will need to change
   % this code to calculate rChg and rDis correctly for arbitrary function inputs
+  #Q = getParamESC('QParam',T,model); 
+  #iChgPulse = 10*Q*[zeros(5,1); -ones(10,1); zeros(5,1)];  % [A] charge pulse
+  #iDisPulse = 10*Q*[zeros(5,1);  ones(10,1); zeros(5,1)];  % [A] discharge pulse
+  #[vk,~,~,~,~] = simCell(iChgPulse,25,model,1,0.5,0,0);
+  #rChg  = abs((max(vk)-vk(1))/min(iChgPulse));
+  #[vk,~,~,~,~] = simCell(iDisPulse,25,model,1,0.5,0,0);
+  #rDis  = abs((min(vk)-vk(1))/max(iDisPulse));
   Q = getParamESC('QParam',T,model); 
-  iChgPulse = 10*Q*[zeros(5,1); -ones(10,1); zeros(5,1)];  % [A] charge pulse
-  iDisPulse = 10*Q*[zeros(5,1);  ones(10,1); zeros(5,1)];  % [A] discharge pulse
-  [vk,~,~,~,~] = simCell(iChgPulse,25,model,1,0.5,0,0);
+  iChgPulse = 10*Q*[zeros(dT/2,1); -ones(dT,1); zeros(dT/2,1)];  % [A] charge pulse
+  iDisPulse = 10*Q*[zeros(dT/2,1);  ones(dT,1); zeros(dT/2,1)];  % [A] discharge pulse
+  [vk,~,~,~,~] = simCell(iChgPulse,T,model,1,z0,0,0);
   rChg  = abs((max(vk)-vk(1))/min(iChgPulse));
-  [vk,~,~,~,~] = simCell(iDisPulse,25,model,1,0.5,0,0);
+  [vk,~,~,~,~] = simCell(iDisPulse,T,model,1,z0,0,0);
   rDis  = abs((min(vk)-vk(1))/max(iDisPulse));
   
+  #####
   soc = z0 ;
   OCV      = OCVfromSOCtemp(soc,T,model);
   iDisMaxV = (OCV-vMin)/rDis;
   iDisMaxZ = (soc - zMin)*3600*Q/dT;
-  iDisMax  = max(0,min([iDisMaxV;iDisMaxZ;iMax*ones(size(soc))]));
+  iDisMax  = np * max(0,min([iDisMaxV;iDisMaxZ;iMax*ones(size(soc))]));
   pDisMax  = min(vMin*iDisMax,pMax*ones(size(soc)));
   iChgMinV = (OCV-vMax)/rChg;
   iChgMinZ = (soc - zMax)*3600*Q/eta/dT;
-  iChgMin  = max([iChgMinV;iChgMinZ;iMin*ones(size(soc))]);
+  iChgMin  = np * max([iChgMinV;iChgMinZ;iMin*ones(size(soc))]);
   pChgMin  = min(0,max(vMax*iChgMin,pMin*ones(size(soc))));
   % Now, compute pDis and pChg using rChg and rDis from above, and the equations
   % from the notes. Be sure to incorporate z0, T, dT, eta, ns, np, and the limits
   % correctly (The example code from Lesson 5.3.4 does not implement all of this
   % functionality! You will need to study Lessons 5.3.2 and 5.3.3 to see which
   % equations need to be implemented.)
-  pDis = pDisMax;  % You will need to change this to compute it correctly
-  pChg = pChgMin; % You will need to change this to compute it correctly
+  pDis = ns * pDisMax;  % You will need to change this to compute it correctly
+  pChg = ns *  pChgMin; % You will need to change this to compute it correctly
 end
 
 % This code tests your HPPCpower function using default input values

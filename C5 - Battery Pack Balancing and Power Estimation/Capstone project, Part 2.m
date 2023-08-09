@@ -60,18 +60,18 @@ function [pChg,pDis] = HPPCpower(z0,T,dT,eta,ns,np,model,limits)
   iDisMaxV = (OCV-vMin)/rDis;
   iDisMaxZ = (soc - zMin)*3600*Q/dT;
   iDisMax  = np * max(0,min([iDisMaxV;iDisMaxZ;iMax*ones(size(soc))]));
-  pDisMax  = min(vMin*iDisMax,pMax*ones(size(soc)));
+  pDisMax  = ns * min(vMin*iDisMax,pMax*ones(size(soc)));
   iChgMinV = (OCV-vMax)/rChg;
   iChgMinZ = (soc - zMax)*3600*Q/eta/dT;
   iChgMin  = np * max([iChgMinV;iChgMinZ;iMin*ones(size(soc))]);
-  pChgMin  = min(0,max(vMax*iChgMin,pMin*ones(size(soc))));
+  pChgMin  = ns * min(0,max(vMax*iChgMin,pMin*ones(size(soc))));
   % Now, compute pDis and pChg using rChg and rDis from above, and the equations
   % from the notes. Be sure to incorporate z0, T, dT, eta, ns, np, and the limits
   % correctly (The example code from Lesson 5.3.4 does not implement all of this
   % functionality! You will need to study Lessons 5.3.2 and 5.3.3 to see which
   % equations need to be implemented.)
-  pDis = ns * pDisMax;  % You will need to change this to compute it correctly
-  pChg = ns *  pChgMin; % You will need to change this to compute it correctly
+  pDis = pDisMax;  % You will need to change this to compute it correctly
+  pChg = pChgMin; % You will need to change this to compute it correctly
 end
 
 % This code tests your HPPCpower function using default input values
